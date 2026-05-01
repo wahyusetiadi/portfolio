@@ -1,0 +1,234 @@
+{
+  "settings": {
+    "defaultLang": "id",
+    "multiLangEnabled": true,
+    "defaultTheme": "dark"
+  },
+  "profile": {
+    "name": "Wahyu Setiadi",
+    "title": {
+      "id": "Fullstack Web Developer",
+      "en": "Fullstack Web Developer"
+    },
+    "bio": {
+      "id": "Saya membangun aplikasi web dari ujung ke ujung — dari antarmuka yang intuitif hingga arsitektur backend yang kokoh. Fokus pada kualitas kode, performa, dan pengalaman pengguna yang bermakna.",
+      "en": "I build web applications end-to-end — from intuitive interfaces to robust backend architectures. Focused on code quality, performance, and meaningful user experiences."
+    },
+    "email": "wahyu96se@gmail.com",
+    "github": "https://github.com/wahyusetiadi",
+    "linkedin": "https://www.linkedin.com/in/wahyu-setiadi-a09131213",
+    "twitter": "https://twitter.com",
+    "location": "Banjarbaru, Indonesia",
+    "available": true,
+    "avatar": "",
+    "yearsExp": "3+"
+  },
+  "skills": [
+    {
+      "id": "1",
+      "name": "React / Next.js",
+      "level": 90,
+      "category": "Frontend"
+    },
+    {
+      "id": "2",
+      "name": "TypeScript",
+      "level": 85,
+      "category": "Language"
+    },
+    {
+      "id": "3",
+      "name": "Node.js / Express",
+      "level": 82,
+      "category": "Backend"
+    },
+    {
+      "id": "4",
+      "name": "PostgreSQL",
+      "level": 78,
+      "category": "Database"
+    },
+    {
+      "id": "5",
+      "name": "Tailwind CSS",
+      "level": 92,
+      "category": "Frontend"
+    },
+    {
+      "id": "6",
+      "name": "Docker",
+      "level": 70,
+      "category": "DevOps"
+    },
+    {
+      "id": "7",
+      "name": "Redis",
+      "level": 68,
+      "category": "Database"
+    },
+    {
+      "id": "8",
+      "name": "GraphQL",
+      "level": 72,
+      "category": "Backend"
+    }
+  ],
+  "projects": [
+    {
+      "id": "1",
+      "title": "E-Commerce Platform",
+      "description": {
+        "id": "Platform belanja fullstack dengan fitur checkout real-time, manajemen inventori, dan dashboard analytics untuk merchant.",
+        "en": "Fullstack e-commerce platform with real-time checkout, inventory management, and analytics dashboard for merchants."
+      },
+      "tags": [
+        "Next.js",
+        "Stripe",
+        "PostgreSQL",
+        "Redis"
+      ],
+      "status": "completed",
+      "startDate": "2024-01",
+      "image": "",
+      "github": "https://github.com",
+      "demo": "https://example.com",
+      "featured": true,
+      "year": "2024"
+    },
+    {
+      "id": "2",
+      "title": "Collaborative Task Manager",
+      "description": {
+        "id": "Aplikasi manajemen proyek dengan real-time collaboration, drag-and-drop kanban board, dan integrasi kalender.",
+        "en": "Project management app with real-time collaboration, drag-and-drop kanban board, and calendar integration."
+      },
+      "tags": [
+        "React",
+        "Socket.io",
+        "Node.js",
+        "MongoDB"
+      ],
+      "status": "completed",
+      "startDate": "2024-01",
+      "image": "",
+      "github": "https://github.com",
+      "demo": "https://example.com",
+      "featured": true,
+      "year": "2024"
+    },
+    {
+      "id": "3",
+      "title": "API Gateway Service",
+      "description": {
+        "id": "Microservice gateway dengan rate limiting, autentikasi JWT, logging terpusat, dan monitoring real-time.",
+        "en": "Microservice gateway with rate limiting, JWT authentication, centralized logging, and real-time monitoring."
+      },
+      "tags": [
+        "Node.js",
+        "Docker",
+        "Redis",
+        "Grafana"
+      ],
+      "status": "completed",
+      "startDate": "2023-01",
+      "image": "",
+      "github": "https://github.com",
+      "demo": "",
+      "featured": false,
+      "year": "2023"
+    },
+    {
+      "id": "4",
+      "title": "AI Writing Assistant",
+      "description": {
+        "id": "Tool menulis berbantuan AI dengan fitur template, tone adjustment, dan ekspor ke berbagai format dokumen.",
+        "en": "AI-powered writing tool with templates, tone adjustment, and export to multiple document formats."
+      },
+      "tags": [
+        "Next.js",
+        "OpenAI",
+        "Prisma",
+        "Vercel"
+      ],
+      "status": "completed",
+      "startDate": "2023-06",
+      "image": "",
+      "github": "https://github.com",
+      "demo": "https://example.com",
+      "featured": false,
+      "year": "2023"
+    }
+  ],
+  "ongoingProjects": [],
+  "experiences": [
+    {
+      "id": "1",
+      "company": "Startup Teknologi",
+      "role": {
+        "id": "Senior Fullstack Developer",
+        "en": "Senior Fullstack Developer"
+      },
+      "period": "2022 — Sekarang",
+      "description": {
+        "id": "Memimpin pengembangan platform SaaS yang melayani 50.000+ pengguna aktif. Merancang arsitektur microservices dan membangun pipeline CI/CD yang mengurangi deployment time hingga 70%.",
+        "en": "Led development of a SaaS platform serving 50,000+ active users. Designed microservices architecture and built CI/CD pipelines that reduced deployment time by 70%."
+      }
+    },
+    {
+      "id": "2",
+      "company": "Digital Agency",
+      "role": {
+        "id": "Fullstack Developer",
+        "en": "Fullstack Developer"
+      },
+      "period": "2020 — 2022",
+      "description": {
+        "id": "Mengembangkan lebih dari 20 proyek web untuk klien berbagai industri, mulai dari fintech hingga e-commerce. Bertanggung jawab atas seluruh lifecycle pengembangan produk.",
+        "en": "Developed 20+ web projects for clients across various industries, from fintech to e-commerce. Responsible for the entire product development lifecycle."
+      }
+    },
+    {
+      "id": "3",
+      "company": "Freelance",
+      "role": {
+        "id": "Web Developer",
+        "en": "Web Developer"
+      },
+      "period": "2019 — 2020",
+      "description": {
+        "id": "Membangun website dan aplikasi web untuk klien UMKM lokal, dengan fokus pada performa dan kemudahan penggunaan.",
+        "en": "Built websites and web applications for local SME clients, focusing on performance and ease of use."
+      }
+    }
+  ],
+  "contact": {
+    "headline": {
+      "id": "Ada proyek menarik?",
+      "en": "Have an interesting project?"
+    },
+    "subtext": {
+      "id": "Saya terbuka untuk diskusi kolaborasi, proyek freelance, atau peluang kerja baru.",
+      "en": "I'm open for collaboration discussions, freelance projects, or new job opportunities."
+    },
+    "messages": [
+      {
+        "name": "oling",
+        "email": "wahyu96se@gmail.com",
+        "message": "testing",
+        "date": "2026-03-13T01:53:27.948Z"
+      },
+      {
+        "name": "Oling",
+        "email": "wahyusetiadi330@gmail.com",
+        "message": "Testing",
+        "date": "2026-04-10T03:36:31.579Z"
+      },
+      {
+        "name": "Vergil",
+        "email": "wahyusetiadi330@gmail.com",
+        "message": "geloooo\n",
+        "date": "2026-04-10T03:40:20.364Z"
+      }
+    ]
+  }
+}
