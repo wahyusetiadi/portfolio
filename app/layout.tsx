@@ -1,15 +1,14 @@
 import type { Metadata } from 'next';
-import fs from 'fs';
-import path from 'path';
 import './globals.css';
 import { AppProvider } from './components/AppProvider';
 import type { Theme, Lang } from './lib/types';
+import { readPortfolioData } from '@/lib/portfolioStore';
 
-const DATA = path.join(process.cwd(), 'app/api/data/portfolio.json');
+export const dynamic = 'force-dynamic';
 
-function getSettings() {
+async function getSettings() {
   try {
-    const d = JSON.parse(fs.readFileSync(DATA, 'utf-8'));
+    const d = await readPortfolioData();
     return d.settings as { defaultTheme: Theme; defaultLang: Lang; multiLangEnabled: boolean };
   } catch {
     return { defaultTheme: 'dark' as Theme, defaultLang: 'id' as Lang, multiLangEnabled: true };
@@ -30,8 +29,8 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title: 'Portfolio — Fullstack Web Developer' },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const { defaultTheme, defaultLang, multiLangEnabled } = getSettings();
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { defaultTheme, defaultLang, multiLangEnabled } = await getSettings();
   return (
     <html lang={defaultLang} suppressHydrationWarning>
       <head>

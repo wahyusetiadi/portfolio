@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import nodemailer from "nodemailer";
-
-const dataPath = path.join(process.cwd(), "app/api/data/portfolio.json");
+import { readPortfolioData, writePortfolioData } from "@/lib/portfolioStore";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -15,8 +12,7 @@ const transporter = nodemailer.createTransport({
 
 export async function GET() {
   try {
-    const data = fs.readFileSync(dataPath, "utf-8");
-    const parsed = JSON.parse(data);
+    const parsed = await readPortfolioData();
     // Jangan expose pesan kontak (email, dll) ke publik.
     const safe = {
       ...parsed,
@@ -36,13 +32,12 @@ export async function POST(request: Request) {
     const { name, email, message } = await request.json();
 
     // Simpan ke JSON
-    const raw = fs.readFileSync(dataPath, "utf-8");
-    const data = JSON.parse(raw);
+    const data = await readPortfolioData();
     data.contact.messages = [
       ...(data.contact.messages || []),
       { name, email, message, date: new Date().toISOString() },
     ];
-    fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
+    await writePortfolioData(data);
 
     // Kirim email
     let emailSent = false;

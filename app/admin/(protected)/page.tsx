@@ -17,6 +17,7 @@ export default function AdminPage() {
   const [tab, setTab] = useState<Tab>('profile');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
   const [expandedOngoing, setExpandedOngoing] = useState<string | null>(null);
   const [tagInputs, setTagInputs] = useState<Record<string, string>>({});
@@ -31,8 +32,15 @@ export default function AdminPage() {
   const save = async () => {
     if (!data) return;
     setSaving(true);
+    setSaveError(null);
     const res = await fetch('/api/admin/portfolio', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
     if (res.status === 401) { router.replace('/admin/login'); return; }
+    if (!res.ok) {
+      const j = (await res.json().catch(() => null)) as { error?: string } | null;
+      setSaveError(j?.error || `Gagal menyimpan (HTTP ${res.status})`);
+      setSaving(false);
+      return;
+    }
     setSaving(false); setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
@@ -129,6 +137,13 @@ export default function AdminPage() {
             </button>
           </div>
         </div>
+        {saveError ? (
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 28px 12px' }}>
+            <div style={{ padding: '10px 12px', borderRadius: 10, border: '1px solid rgba(239,68,68,0.35)', background: 'rgba(239,68,68,0.08)', color: 'var(--danger)', fontSize: 13 }}>
+              {saveError}
+            </div>
+          </div>
+        ) : null}
       </header>
 
       <div className="admin-layout" style={{ maxWidth: 1200, margin: '0 auto', padding: '36px 28px', display: 'flex', gap: 40 }}>
