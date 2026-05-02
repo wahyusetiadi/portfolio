@@ -94,9 +94,14 @@ export default function PortfolioPage() {
         transition: 'all 0.3s',
       }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 28px', height: 66, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <button onClick={() => scrollTo('home')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: 18, color: 'var(--text)' }}>
-            {profile.name.split(' ')[0] || 'Dev'}
-            <span style={{ color: 'var(--accent)' }}>.</span>
+          <button onClick={() => scrollTo('home')} aria-label="Home" style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: 18, color: 'var(--text)' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <img src="/logo.png" alt="Logo" width={22} height={22} style={{ display: 'block' }} />
+              <span>
+                {profile.name.split(' ')[0] || 'Dev'}
+                <span style={{ color: 'var(--accent)' }}>.</span>
+              </span>
+            </span>
           </button>
 
           {/* Desktop nav */}
@@ -276,7 +281,7 @@ export default function PortfolioPage() {
                     { prompt: false, text: `  frontend: "React, Next.js",`, color: 'var(--accent)' },
                     { prompt: false, text: `  backend:  "Node.js, Express",`, color: 'var(--accent-2)' },
                     { prompt: false, text: `  database: "PostgreSQL, Redis",`, color: 'var(--warning)' },
-                    { prompt: false, text: `  devops:   "Docker, CI/CD"`, color: 'var(--success)' },
+                    // { prompt: false, text: `  devops:   "Docker, CI/CD"`, color: 'var(--success)' },
                     { prompt: false, text: '}', color: 'var(--text-2)' },
                     { prompt: true,  text: 'status' },
                     { prompt: false, text: profile.available ? '✓ Available for hire' : '✗ Not available', color: profile.available ? 'var(--success)' : 'var(--danger)' },
@@ -373,17 +378,20 @@ export default function PortfolioPage() {
                       <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.12em' }}>{cat.toUpperCase()}</span>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      {catSkills.map(s => (
-                        <div key={s.id}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                            <span style={{ fontSize: 14, color: 'var(--text)' }}>{s.name}</span>
-                            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--text-muted)' }}>{s.level}%</span>
-                          </div>
-                          <div style={{ height: 3, background: 'var(--bg-elevated)', borderRadius: 99 }}>
-                            <div style={{ height: '100%', width: `${s.level}%`, background: CATEGORY_COLORS[cat] || 'var(--accent)', borderRadius: 99, transition: 'width 0.6s ease' }} />
-                          </div>
-                        </div>
-                      ))}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {catSkills.map(s => (
+                          <span
+                            key={s.id}
+                            className="tag"
+                            style={{
+                              cursor: 'default',
+                              borderColor: (CATEGORY_COLORS[cat] ? `${CATEGORY_COLORS[cat]}66` : 'var(--border)'),
+                            }}
+                          >
+                            {s.name}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 ))}

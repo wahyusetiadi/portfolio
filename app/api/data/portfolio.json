@@ -32,36 +32,42 @@
     },
     {
       "id": "2",
+      "name": "JavaScript",
+      "level": 88,
+      "category": "Language"
+    },
+    {
+      "id": "3",
       "name": "TypeScript",
       "level": 85,
       "category": "Language"
     },
     {
-      "id": "3",
+      "id": "4",
       "name": "Node.js / Express",
       "level": 82,
       "category": "Backend"
     },
     {
-      "id": "4",
+      "id": "5",
       "name": "PostgreSQL",
       "level": 78,
       "category": "Database"
     },
     {
-      "id": "5",
+      "id": "6",
       "name": "Tailwind CSS",
       "level": 92,
       "category": "Frontend"
     },
     {
-      "id": "6",
+      "id": "7",
       "name": "Docker",
       "level": 70,
       "category": "DevOps"
     },
     {
-      "id": "7",
+      "id": "8",
       "name": "Redis",
       "level": 68,
       "category": "Database"
@@ -165,39 +171,26 @@
       "id": "1",
       "company": "Startup Teknologi",
       "role": {
-        "id": "Senior Fullstack Developer",
-        "en": "Senior Fullstack Developer"
+        "id": "Fullstack Web Developer",
+        "en": "Fullstack Web Developer"
       },
-      "period": "2022 — Sekarang",
+      "period": "2025 — Sekarang",
       "description": {
         "id": "Memimpin pengembangan platform SaaS yang melayani 50.000+ pengguna aktif. Merancang arsitektur microservices dan membangun pipeline CI/CD yang mengurangi deployment time hingga 70%.",
         "en": "Led development of a SaaS platform serving 50,000+ active users. Designed microservices architecture and built CI/CD pipelines that reduced deployment time by 70%."
       }
     },
     {
-      "id": "2",
-      "company": "Digital Agency",
-      "role": {
-        "id": "Fullstack Developer",
-        "en": "Fullstack Developer"
-      },
-      "period": "2020 — 2022",
-      "description": {
-        "id": "Mengembangkan lebih dari 20 proyek web untuk klien berbagai industri, mulai dari fintech hingga e-commerce. Bertanggung jawab atas seluruh lifecycle pengembangan produk.",
-        "en": "Developed 20+ web projects for clients across various industries, from fintech to e-commerce. Responsible for the entire product development lifecycle."
-      }
-    },
-    {
       "id": "3",
       "company": "Freelance",
       "role": {
-        "id": "Web Developer",
-        "en": "Web Developer"
+        "id": "Design Grafis",
+        "en": "Design Grafis"
       },
-      "period": "2019 — 2020",
+      "period": "2019 — 2024",
       "description": {
-        "id": "Membangun website dan aplikasi web untuk klien UMKM lokal, dengan fokus pada performa dan kemudahan penggunaan.",
-        "en": "Built websites and web applications for local SME clients, focusing on performance and ease of use."
+        "id": "Membuat Mockup logo, brand kaos, jaket serta browsur atau banner untuk acara",
+        "en": "Creating logo mockups, branding for T-shirts and jackets, as well as brochures or event banners."
       }
     }
   ],

@@ -20,6 +20,11 @@ export const metadata: Metadata = {
   description: 'Personal portfolio of a fullstack web developer. React, Next.js, Node.js, PostgreSQL, TypeScript.',
   keywords: ['fullstack developer', 'web developer', 'React', 'Next.js', 'Node.js', 'TypeScript'],
   authors: [{ name: 'Fullstack Developer' }],
+  icons: {
+    icon: [{ url: '/logo.png', type: 'image/png' }],
+    shortcut: ['/favicon.png'],
+    apple: [{ url: '/logo.png', type: 'image/png' }],
+  },
   openGraph: {
     type: 'website',
     title: 'Portfolio — Fullstack Web Developer',
