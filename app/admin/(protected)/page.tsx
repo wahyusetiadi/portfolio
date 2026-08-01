@@ -18,6 +18,7 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
   const [expandedOngoing, setExpandedOngoing] = useState<string | null>(null);
   const [tagInputs, setTagInputs] = useState<Record<string, string>>({});
@@ -25,8 +26,16 @@ export default function AdminPage() {
   useEffect(() => {
     fetch('/api/admin/portfolio').then(async r => {
       if (r.status === 401) { router.replace('/admin/login'); return null; }
-      return r.json();
-    }).then(d => { if (d) setData(d); });
+      const j = await r.json().catch(() => null) as (PortfolioData & { error?: string; storage?: string }) | null;
+      if (!r.ok) {
+        const storage = j?.storage ? ` (${j.storage})` : '';
+        setLoadError(`${j?.error || `Gagal memuat data (HTTP ${r.status})`}${storage}`);
+        return null;
+      }
+      return j as PortfolioData | null;
+    }).then(d => { if (d) setData(d); }).catch(err => {
+      setLoadError(err instanceof Error ? err.message : 'Gagal memuat data');
+    });
   }, [router]);
 
   const save = async () => {
@@ -51,8 +60,14 @@ export default function AdminPage() {
   };
 
   if (!data) return (
-    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
-      <div style={{ width: 32, height: 32, border: '2px solid var(--accent)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', color: 'var(--text)', padding: 24 }}>
+      {loadError ? (
+        <div style={{ maxWidth: 560, border: '1px solid rgba(239,68,68,0.35)', background: 'rgba(239,68,68,0.08)', color: 'var(--danger)', borderRadius: 10, padding: 16, fontSize: 14 }}>
+          {loadError}
+        </div>
+      ) : (
+        <div style={{ width: 32, height: 32, border: '2px solid var(--accent)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      )}
     </div>
   );
 

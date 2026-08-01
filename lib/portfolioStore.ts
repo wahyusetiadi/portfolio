@@ -32,15 +32,30 @@ async function upstashCommand(command: unknown[]): Promise<unknown> {
     cache: "no-store",
   });
 
-  const j = (await res.json().catch(() => null)) as { result?: unknown; error?: string } | null;
-  if (!res.ok) throw new Error(`Upstash request failed (${res.status})`);
+  const text = await res.text();
+  let j: { result?: unknown; error?: string } | null = null;
+  try {
+    j = text ? JSON.parse(text) : null;
+  } catch {
+    throw new Error(`Upstash returned invalid JSON (${res.status})`);
+  }
+  if (!res.ok) throw new Error(`Upstash request failed (${res.status})${j?.error ? `: ${j.error}` : ""}`);
   if (j?.error) throw new Error(j.error);
   return j?.result;
 }
 
+function parsePortfolioData(raw: string, source: string): PortfolioData {
+  try {
+    return JSON.parse(raw) as PortfolioData;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(`Portfolio data in ${source} is not valid JSON: ${message}`);
+  }
+}
+
 function readFromFile(): PortfolioData {
   const raw = fs.readFileSync(getFileDataPath(), "utf8");
-  return JSON.parse(raw) as PortfolioData;
+  return parsePortfolioData(raw, getFileDataPath());
 }
 
 function writeToFile(data: PortfolioData): void {
@@ -54,8 +69,9 @@ export function getPortfolioStorageMode(): "upstash" | "file" {
 export async function readPortfolioData(): Promise<PortfolioData> {
   if (hasUpstashEnv()) {
     const key = getUpstashKey();
-    const raw = (await upstashCommand(["GET", key])) as string | null;
-    if (raw) return JSON.parse(raw) as PortfolioData;
+    const raw = await upstashCommand(["GET", key]);
+    if (typeof raw === "string" && raw) return parsePortfolioData(raw, `Upstash key "${key}"`);
+    if (raw != null) throw new Error(`Portfolio data in Upstash key "${key}" is not a JSON string`);
   }
   return readFromFile();
 }
