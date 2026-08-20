@@ -16,22 +16,25 @@ async function getSettings() {
 }
 
 export const metadata: Metadata = {
-  title: 'Portfolio — Fullstack Web Developer',
-  description: 'Personal portfolio of a fullstack web developer. React, Next.js, Node.js, PostgreSQL, TypeScript.',
+  title: 'Wahyu Setiadi — Fullstack Web Developer',
+  description: 'Portfolio Wahyu Setiadi, Fullstack Web Developer yang membangun aplikasi web end-to-end dengan React, Next.js, Node.js, dan TypeScript.',
   keywords: ['fullstack developer', 'web developer', 'React', 'Next.js', 'Node.js', 'TypeScript'],
-  authors: [{ name: 'Fullstack Developer' }],
+  authors: [{ name: 'Wahyu Setiadi' }],
+  ...(process.env.NEXT_PUBLIC_SITE_URL ? { metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL) } : {}),
+  alternates: process.env.NEXT_PUBLIC_SITE_URL ? { canonical: '/' } : undefined,
   icons: {
-    icon: [{ url: '/logo.png', type: 'image/png' }],
-    shortcut: ['/favicon.png'],
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    shortcut: ['/favicon.svg'],
     apple: [{ url: '/logo.png', type: 'image/png' }],
   },
   openGraph: {
     type: 'website',
-    title: 'Portfolio — Fullstack Web Developer',
-    description: 'Building end-to-end web applications with modern technologies.',
-    siteName: 'Portfolio',
+    title: 'Wahyu Setiadi — Fullstack Web Developer',
+    description: 'Portfolio Wahyu Setiadi, Fullstack Web Developer.',
+    siteName: 'Wahyu Setiadi',
+    ...(process.env.NEXT_PUBLIC_SITE_URL ? { url: process.env.NEXT_PUBLIC_SITE_URL } : {}),
   },
-  twitter: { card: 'summary_large_image', title: 'Portfolio — Fullstack Web Developer' },
+  twitter: { card: 'summary_large_image', title: 'Wahyu Setiadi — Fullstack Web Developer' },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

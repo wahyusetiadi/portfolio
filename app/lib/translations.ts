@@ -11,6 +11,7 @@ export const UI = {
     home:        { id: 'Beranda',     en: 'Home' },
     work:        { id: 'Proyek',      en: 'Work' },
     about:       { id: 'Tentang',     en: 'About' },
+    experience:  { id: 'Pengalaman',  en: 'Experience' },
     contact:     { id: 'Kontak',      en: 'Contact' },
     allProjects: { id: 'Semua Proyek', en: 'All Projects' },
   },

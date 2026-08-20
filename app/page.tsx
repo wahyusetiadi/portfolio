@@ -5,7 +5,7 @@ import { useApp } from './components/AppProvider';
 import { UI, tx } from './lib/translations';
 import type { PortfolioData } from './lib/types';
 
-type Section = 'home' | 'work' | 'about' | 'contact';
+type Section = 'home' | 'work' | 'about' | 'experience' | 'contact';
 
 export default function PortfolioPage() {
   const { theme, lang, multiLangEnabled, toggleTheme, setLang } = useApp();
@@ -25,7 +25,7 @@ export default function PortfolioPage() {
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 40);
-      const sections: Section[] = ['home', 'work', 'about', 'contact'];
+      const sections: Section[] = ['home', 'work', 'about', 'experience', 'contact'];
       for (const s of sections) {
         const el = document.getElementById(s);
         if (el) {
@@ -74,6 +74,7 @@ export default function PortfolioPage() {
     { id: 'home',    label: UI.nav.home    },
     { id: 'work',    label: UI.nav.work    },
     { id: 'about',   label: UI.nav.about   },
+    { id: 'experience', label: UI.nav.experience },
     { id: 'contact', label: UI.nav.contact },
   ];
 
@@ -399,7 +400,7 @@ export default function PortfolioPage() {
             </div>
 
             {/* Experience */}
-            <div>
+            <div id="experience" className="experience-block">
               <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, fontSize: 20, marginBottom: 32, color: 'var(--text-2)' }}>
                 {tx(UI.about.experience, lang)}
               </h3>

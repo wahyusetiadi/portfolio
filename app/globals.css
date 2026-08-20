@@ -125,6 +125,12 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
   border-radius: 14px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
+.experience-block { scroll-margin-top: 96px; }
+
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
 .card:hover { border-color: var(--border-hover); box-shadow: var(--shadow-sm); }
 
 .card-glow:hover {
@@ -214,4 +220,13 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
   .admin-sidebar nav { flex-direction:row !important; flex-wrap:wrap !important; overflow-x:auto; position:static !important; }
   .admin-grid2 { grid-template-columns:1fr !important; }
   .admin-grid3 { grid-template-columns:1fr !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
