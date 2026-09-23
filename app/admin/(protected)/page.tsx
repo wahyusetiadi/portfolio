@@ -102,6 +102,14 @@ export default function AdminPage() {
   const addExp = () => setData({ ...data, experiences: [...data.experiences, { id: Date.now().toString(), company: 'Company', role: { id: 'Posisi', en: 'Position' }, period: '2024 — Now', description: { id: '', en: '' } }] });
   const updateSettings  = (k: string, v: string | boolean) => setData({ ...data, settings: { ...data.settings, [k]: v } });
   const updateContactI18n = (field: 'headline' | 'subtext', lang: 'id' | 'en', v: string) => setData({ ...data, contact: { ...data.contact, [field]: { ...data.contact[field], [lang]: v } } });
+  const updateContactLink = (key: 'whatsapp' | 'email' | 'linkedin' | 'github' | 'website', value: string) => setData({ ...data, contact: { ...data.contact, links: { ...(data.contact.links || {}), [key]: value } } });
+  const uploadImage = async (file: File, onDone: (url: string) => void) => {
+    const form = new FormData(); form.append('file', file);
+    const res = await fetch('/api/admin/upload', { method: 'POST', body: form });
+    const body = await res.json().catch(() => ({}));
+    if (res.ok && body.url) onDone(body.url);
+    else setSaveError(body.error || 'Upload gambar gagal');
+  };
 
   const addTag = (listKey: 'project' | 'ongoing', id: string) => {
     const key = `${listKey}-${id}`;
@@ -196,6 +204,12 @@ export default function AdminPage() {
                     <Field label="Nama Lengkap" value={profile.name} onChange={v => updateProfile('name', v)} />
                     <Field label="Lokasi" value={profile.location} onChange={v => updateProfile('location', v)} />
                     <Field label="Tahun Pengalaman" value={profile.yearsExp} onChange={v => updateProfile('yearsExp', v)} />
+                    <Field label="URL CV / Resume" value={profile.resumeUrl || ''} onChange={v => updateProfile('resumeUrl', v)} placeholder="https://.../cv.pdf" />
+                    <Field label="URL gambar social preview" value={profile.socialImageUrl || ''} onChange={v => updateProfile('socialImageUrl', v)} placeholder="https://.../social-preview.png" />
+                    <div>
+                      <label style={LBL}>Upload gambar social preview (maks. 5 MB)</label>
+                      <input type="file" accept="image/*" onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage(f, url => updateProfile('socialImageUrl', url)); }} />
+                    </div>
                   </div>
                   <div className="admin-grid2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
                     <Field label="Judul — Indonesia" value={typeof profile.title === 'object' ? profile.title.id : profile.title} onChange={v => updateProfileI18n('title', 'id', v)} />
@@ -209,7 +223,14 @@ export default function AdminPage() {
                     <Field label="Email" value={profile.email} onChange={v => updateProfile('email', v)} />
                     <Field label="GitHub URL" value={profile.github} onChange={v => updateProfile('github', v)} />
                     <Field label="LinkedIn URL" value={profile.linkedin} onChange={v => updateProfile('linkedin', v)} />
-                    <Field label="Twitter URL" value={profile.twitter} onChange={v => updateProfile('twitter', v)} />
+                    <Field label="Instagram URL" value={profile.instagram} onChange={v => updateProfile('instagram', v)} />
+                  </div>
+                  <div className="admin-grid2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
+                    <Field label="WhatsApp URL / Nomor" value={contact?.links?.whatsapp || ''} onChange={v => updateContactLink('whatsapp', v)} placeholder="https://wa.me/628... atau 628..." />
+                    <Field label="Email tujuan tombol" value={contact?.links?.email || ''} onChange={v => updateContactLink('email', v)} placeholder="email@example.com" />
+                    <Field label="LinkedIn tombol" value={contact?.links?.linkedin || ''} onChange={v => updateContactLink('linkedin', v)} />
+                    <Field label="GitHub tombol" value={contact?.links?.github || ''} onChange={v => updateContactLink('github', v)} />
+                    <Field label="URL lain" value={contact?.links?.website || ''} onChange={v => updateContactLink('website', v)} placeholder="https://..." />
                   </div>
                 </Card>
                 <Card title="STATUS">
@@ -251,6 +272,11 @@ export default function AdminPage() {
                         <div className="admin-grid2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                           <Field label="Judul" value={p.title} onChange={v => updateProject(p.id, { title: v })} />
                           <Field label="Tahun" value={p.year} onChange={v => updateProject(p.id, { year: v })} />
+                        </div>
+                        <div>
+                          <label style={LBL}>Gambar proyek (maks. 5 MB)</label>
+                          <input type="file" accept="image/*" onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage(f, url => updateProject(p.id, { image: url })); }} />
+                          {p.image && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>{p.image}</div>}
                         </div>
                         <div className="admin-grid2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                           <Field label="Deskripsi — Indonesia" value={typeof p.description === 'object' ? p.description.id : ''} onChange={v => updateProjectI18n(p.id, 'id', v)} textarea />

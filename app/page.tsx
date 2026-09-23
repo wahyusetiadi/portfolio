@@ -7,6 +7,11 @@ import type { PortfolioData } from './lib/types';
 
 type Section = 'home' | 'work' | 'about' | 'experience' | 'contact';
 
+function externalHref(label: string, value: string) {
+  if (label === 'WhatsApp' && value && !/^https?:\/\//i.test(value)) return `https://wa.me/${value.replace(/\D/g, '')}`;
+  return value;
+}
+
 export default function PortfolioPage() {
   const { theme, lang, multiLangEnabled, toggleTheme, setLang } = useApp();
   const [data, setData] = useState<PortfolioData | null>(null);
@@ -65,6 +70,8 @@ export default function PortfolioPage() {
   );
 
   const { profile, skills, projects, experiences, contact } = data;
+  const whatsappHref = contact?.links?.whatsapp ? externalHref('WhatsApp', contact.links.whatsapp) : '';
+  const linkedinHref = contact?.links?.linkedin || profile.linkedin || '';
   const catGroups = skills.reduce<Record<string, typeof skills>>((a, s) => {
     if (!a[s.category]) a[s.category] = [];
     a[s.category].push(s); return a;
@@ -89,7 +96,7 @@ export default function PortfolioPage() {
       {/* ── NAVBAR ── */}
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
-        background: scrolled || mobileOpen ? 'rgba(7,7,15,0.92)' : 'transparent',
+        background: scrolled || mobileOpen ? 'var(--nav-bg)' : 'transparent',
         backdropFilter: scrolled || mobileOpen ? 'blur(16px)' : 'none',
         borderBottom: scrolled || mobileOpen ? '1px solid var(--border)' : '1px solid transparent',
         transition: 'all 0.3s',
@@ -244,6 +251,8 @@ export default function PortfolioPage() {
                 <button onClick={() => scrollTo('contact')} className="btn-secondary">
                   {tx(UI.hero.contactMe, lang)}
                 </button>
+                {whatsappHref && <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ textDecoration: 'none' }}>WhatsApp</a>}
+                {profile.resumeUrl && <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ textDecoration: 'none' }}>CV / Resume</a>}
               </div>
 
               <div className="fade-up fade-up-5 hero-stats" style={{ display: 'flex', gap: 36, paddingTop: 32, borderTop: '1px solid var(--border)' }}>
@@ -329,13 +338,14 @@ export default function PortfolioPage() {
           <div className="projects-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {projects.filter(p => p.featured || projects.length <= 4).slice(0, 4).map(p => (
               <div key={p.id} className="card card-glow" style={{ padding: 32 }}>
+                {p.image && <img src={p.image} alt={`Screenshot ${p.title}`} loading="lazy" style={{ width: '100%', aspectRatio: '16 / 9', objectFit: 'cover', borderRadius: 8, marginBottom: 22, border: '1px solid var(--border)' }} />}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {p.featured && <span className="badge badge-featured">{tx(UI.projects.featured, lang)}</span>}
                   </div>
                   <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--text-muted)' }}>{p.year}</span>
                 </div>
-                <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, fontSize: 20, marginBottom: 10, letterSpacing: '-0.3px' }}>{p.title}</h3>
+                <h3 style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, fontSize: 20, marginBottom: 10, letterSpacing: '-0.3px' }}><Link href={`/projects/${p.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>{p.title}</Link></h3>
                 <p style={{ fontSize: 14, color: 'var(--text-2)', lineHeight: 1.7, marginBottom: 20 }}>{tx(p.description, lang)}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 24 }}>
                   {p.tags.map(t => <span key={t} className="tag">{t}</span>)}
@@ -458,6 +468,10 @@ export default function PortfolioPage() {
               <button type="submit" disabled={sending} className="btn-primary" style={{ alignSelf: 'flex-start', opacity: sending ? 0.7 : 1 }}>
                 {sent ? tx(UI.contact.sent, lang) : sending ? tx(UI.contact.sending, lang) : tx(UI.contact.send, lang)}
               </button>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 4 }}>
+                {whatsappHref && <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ textDecoration: 'none' }}>WhatsApp</a>}
+                {linkedinHref && <a href={linkedinHref} target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ textDecoration: 'none' }}>LinkedIn</a>}
+              </div>
             </form>
 
             {/* Social Info */}
@@ -465,13 +479,13 @@ export default function PortfolioPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
                 <div>
                   <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', marginBottom: 10 }}>{tx(UI.contact.directMail, lang)}</div>
-                  <a href={`mailto:${profile.email}`} style={{ fontSize: 18, color: 'var(--text)', textDecoration: 'none', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, wordBreak: 'break-all' }}>{profile.email}</a>
+                  <a href={`mailto:${contact?.links?.email || profile.email}`} style={{ fontSize: 18, color: 'var(--text)', textDecoration: 'none', fontFamily: 'Space Grotesk, sans-serif', fontWeight: 600, wordBreak: 'break-all' }}>{contact?.links?.email || profile.email}</a>
                 </div>
                 <div>
                   <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', marginBottom: 14 }}>{tx(UI.contact.social, lang)}</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {([['GitHub', profile.github], ['LinkedIn', profile.linkedin], ['Twitter', profile.twitter]] as [string, string][]).filter(([, h]) => h).map(([label, href]) => (
-                      <a key={label} href={href} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'var(--text-2)', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 10, transition: 'color 0.2s' }}
+                    {([['GitHub', contact?.links?.github || profile.github], ['LinkedIn', linkedinHref], ['Instagram', profile.instagram], ['Website', contact?.links?.website || ''], ['WhatsApp', whatsappHref]] as [string, string][]).filter(([, h]) => h).map(([label, href]) => (
+                      <a key={label} href={externalHref(label, href)} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'var(--text-2)', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 10, transition: 'color 0.2s' }}
                         onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--accent)'}
                         onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--text-2)'}
                       >

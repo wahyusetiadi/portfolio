@@ -20,11 +20,14 @@ export interface Profile {
   email: string;
   github: string;
   linkedin: string;
-  twitter: string;
+  instagram: string;
   location: string;
   available: boolean;
   avatar: string;
   yearsExp: string;
+  whatsapp?: string;
+  resumeUrl?: string;
+  socialImageUrl?: string;
 }
 
 export interface Skill {
@@ -80,6 +83,13 @@ export interface Contact {
   headline: I18nString;
   subtext: I18nString;
   messages: ContactMsg[];
+  links?: {
+    whatsapp?: string;
+    email?: string;
+    linkedin?: string;
+    github?: string;
+    website?: string;
+  };
 }
 
 export interface PortfolioData {

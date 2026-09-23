@@ -30,6 +30,9 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const { name, email, message } = await request.json();
+    if (typeof name !== "string" || typeof email !== "string" || typeof message !== "string" || !name.trim() || !email.trim() || !message.trim()) {
+      return NextResponse.json({ error: "Nama, email, dan pesan wajib diisi" }, { status: 400 });
+    }
 
     // Simpan ke JSON
     const data = await readPortfolioData();
@@ -42,15 +45,18 @@ export async function POST(request: Request) {
     // Kirim email
     let emailSent = false;
     try {
+      if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD || !process.env.MY_EMAIL) throw new Error("Email env belum dikonfigurasi");
+      const escapeHtml = (value: string) => value.replace(/[&<>\"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#39;' }[c] || c));
       await transporter.sendMail({
         from: `"Portfolio" <${process.env.GMAIL_USER}>`,
         to: process.env.MY_EMAIL,
+        replyTo: email,
         subject: `Pesan baru dari ${name}`,
         html: `
-          <p><strong>Nama:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Nama:</strong> ${escapeHtml(name)}</p>
+          <p><strong>Email:</strong> ${escapeHtml(email)}</p>
           <p><strong>Pesan:</strong></p>
-          <p>${message}</p>
+          <p>${escapeHtml(message).replace(/\n/g, '<br />')}</p>
         `,
       });
       emailSent = true;

@@ -17,11 +17,13 @@
     "email": "wahyu96se@gmail.com",
     "github": "https://github.com/wahyusetiadi",
     "linkedin": "https://www.linkedin.com/in/wahyu-setiadi-a09131213",
-    "twitter": "https://twitter.com",
+    "instagram": "https://www.instagram.com/wsdmc/",
     "location": "Banjarbaru, Indonesia",
     "available": true,
     "avatar": "",
-    "yearsExp": "3+"
+    "yearsExp": "3+",
+    "resumeUrl": "",
+    "socialImageUrl": ""
   },
   "skills": [
     {
@@ -203,6 +205,13 @@
       "id": "Saya terbuka untuk diskusi kolaborasi, proyek freelance, atau peluang kerja baru.",
       "en": "I'm open for collaboration discussions, freelance projects, or new job opportunities."
     },
+    "links": {
+      "whatsapp": "628995666700",
+      "email": "wahyu96se@gmail.com",
+      "linkedin": "https://www.linkedin.com/in/wahyu-setiadi-a09131213/",
+      "github": "https://github.com/wahyusetiadi",
+      "website": ""
+    },
     "messages": [
       {
         "name": "oling",
@@ -221,6 +230,12 @@
         "email": "wahyusetiadi330@gmail.com",
         "message": "geloooo\n",
         "date": "2026-04-10T03:40:20.364Z"
+      },
+      {
+        "name": "Dante",
+        "email": "wahyusetiadi330@gmail.com",
+        "message": "Contoh Email Kirim ke saya",
+        "date": "2026-09-23T15:03:10.292Z"
       }
     ]
   }

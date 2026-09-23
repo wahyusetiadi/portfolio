@@ -24,6 +24,7 @@
   --shadow:       0 8px 32px rgba(0,0,0,0.5);
   --shadow-sm:    0 2px 8px rgba(0,0,0,0.3);
   --noise-op:     0.03;
+  --nav-bg:       rgba(7,7,15,0.92);
 }
 
 /* ─── LIGHT THEME ─── */
@@ -47,6 +48,7 @@
   --shadow:       0 8px 32px rgba(0,0,0,0.08);
   --shadow-sm:    0 2px 8px rgba(0,0,0,0.05);
   --noise-op:     0;
+  --nav-bg:       rgba(246,248,255,0.94);
 }
 
 /* ─── RESET ─── */

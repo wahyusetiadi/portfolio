@@ -289,6 +289,7 @@ export default function ProjectsPage() {
                     key={p.id}
                     className="rounded-[14px] border border-[var(--border)] bg-[var(--bg-card)] p-7 transition hover:border-[var(--accent)] hover:shadow-[0_0_0_1px_var(--accent),0_4px_24px_var(--accent-glow)]"
                   >
+                    {p.image && <img src={p.image} alt={`Screenshot ${p.title}`} loading="lazy" className="mb-5 aspect-video w-full rounded-lg border border-[var(--border)] object-cover" />}
                     <div className="mb-4 flex items-start justify-between">
                       <div className="flex flex-wrap gap-1.5">
                         {p.featured && (
@@ -299,7 +300,7 @@ export default function ProjectsPage() {
                       </div>
                       <span className="font-mono text-[11px] text-[var(--text-muted)]">{p.year}</span>
                     </div>
-                    <h3 className="mb-2.5 font-display text-lg font-semibold tracking-[-0.3px]">{p.title}</h3>
+                    <h3 className="mb-2.5 font-display text-lg font-semibold tracking-[-0.3px]"><Link href={`/projects/${p.id}`} className="hover:text-[var(--accent)]">{p.title}</Link></h3>
                     <p className="mb-[18px] text-sm leading-[1.7] text-[var(--text-2)]">{tx(p.description, lang)}</p>
                     <div className="mb-5 flex flex-wrap gap-1.5">
                       {p.tags.map(t => (
