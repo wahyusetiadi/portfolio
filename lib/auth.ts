@@ -35,6 +35,12 @@ export function getAdminCookieName(): string {
   return COOKIE_NAME;
 }
 
+export function isAdminRequest(request: Request): boolean {
+  const cookie = request.headers.get('cookie') || '';
+  const token = cookie.split(';').map(part => part.trim()).find(part => part.startsWith(`${COOKIE_NAME}=`))?.slice(COOKIE_NAME.length + 1);
+  return token ? verifyAdminSessionToken(token).valid : false;
+}
+
 export function createAdminSessionToken(opts?: { ttlSeconds?: number; now?: number }): string {
   const secret = process.env.AUTH_SECRET;
   if (!secret) throw new Error("AUTH_SECRET is not set");

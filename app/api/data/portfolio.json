@@ -23,7 +23,7 @@
     "avatar": "",
     "yearsExp": "3+",
     "resumeUrl": "",
-    "socialImageUrl": "/uploads/1790334056898-c9bb321d-d1f4-4923-ba1c-1208c10e33b1.png"
+    "socialImageUrl": "/api/social-image/16k3pJyjp4cWQZ8FF4M-ZlMHyseKVLcTq"
   },
   "skills": [
     {
@@ -97,7 +97,7 @@
       ],
       "status": "completed",
       "startDate": "2024-01",
-      "image": "/uploads/1790334096256-3fb49146-e6b9-439c-bcd4-57dba6bb5899.avif",
+      "image": "/api/project-image/1xK7XdtvmRRsCdUquYmFDuAw_9AVSVWPL",
       "github": "https://github.com",
       "demo": "https://example.com",
       "featured": true,

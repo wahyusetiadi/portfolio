@@ -1,6 +1,6 @@
 # Simpan gambar proyek di Google Drive
 
-Integrasi ini hanya berlaku untuk **upload gambar proyek baru**. Gambar proyek yang sudah berada di `public/uploads` tetap dapat digunakan. Upload social preview tetap memakai penyimpanan lokal.
+Jika kredensial Google Drive tersedia, gambar proyek disimpan dalam folder **Portfolio Project Images** dan social preview dalam folder **Portfolio Social Preview**. Folder dibuat otomatis saat upload pertama. Kedua jenis gambar dilayani melalui server portfolio sehingga file Drive tidak perlu dibagikan secara publik.
 
 ## 1. Siapkan Google Cloud
 
@@ -36,9 +36,9 @@ Jika Anda sudah membuat token saat status **Testing**, jalankan kembali skrip ot
 1. Login ke Admin portfolio.
 2. Pada menu Proyek, unggah JPG, PNG, WebP, atau AVIF (maksimal 5 MB).
 3. Klik **Simpan Perubahan**.
-4. Buka halaman proyek. URL gambar baru akan berawalan `/api/project-image/`; file berada di Google Drive dan disajikan melalui server portfolio. File Drive tidak perlu dibagikan secara publik.
+4. Buka halaman proyek. URL gambar baru akan berawalan `/api/project-image/`. Di admin, gambar yang tersimpan tampil sebagai pratinjau; input pemilih file tetap kosong setelah halaman dimuat ulang karena browser tidak menyimpan pilihan file. Setelah upload baru, klik **Simpan Perubahan** agar URL gambar tersimpan.
 
-Jika tidak ada variabel Google Drive, upload proyek menggunakan `public/uploads` seperti sebelumnya. Jika baru sebagian variabel yang terisi, upload proyek menampilkan error konfigurasi agar tidak tersimpan ke lokasi yang salah. Pada deployment, isi ketiga variabel yang sama di **Vercel → Project Settings → Environment Variables** untuk environment Production. Tambahkan `NEXT_PUBLIC_SITE_URL=https://wsdmc.vercel.app`. Gambar lama di `public/uploads` perlu tetap tersedia sampai diunggah ulang ke Drive.
+Jika tidak ada variabel Google Drive, upload menggunakan `public/uploads` seperti sebelumnya pada server lokal. Folder ini diabaikan Git, jadi upload lokal tidak ikut commit dan tidak tersedia di Vercel. Jika baru sebagian variabel yang terisi, upload menampilkan error konfigurasi agar tidak tersimpan ke lokasi yang salah. Pada deployment, isi ketiga variabel yang sama di **Vercel → Project Settings → Environment Variables** untuk environment Production. Tambahkan `NEXT_PUBLIC_SITE_URL=https://wsdmc.vercel.app`.
 
 Metadata proyek (termasuk URL gambar) disimpan terpisah dari file gambar. Pada Vercel, konfigurasi pasangan `UPSTASH_REDIS_REST_URL` dan `UPSTASH_REDIS_REST_TOKEN` diperlukan agar perubahan dari admin tersimpan setelah deployment. Integrasi Vercel juga dapat membuat pasangan `KV_REST_API_URL` dan `KV_REST_API_TOKEN`; aplikasi menerima salah satu pasangan tersebut. Kedua nilai harus berasal dari satu database Upstash yang sama. Setelah menambah atau mengganti environment variable di Vercel, lakukan redeploy agar deployment baru memakainya.
 

@@ -5,6 +5,11 @@ const DRIVE_API = 'https://www.googleapis.com/drive/v3/files';
 const DRIVE_UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3/files';
 
 let cachedToken: { value: string; expiresAt: number } | null = null;
+const folderPromises = new Map<string, Promise<string>>();
+const IMAGE_FOLDERS = {
+  project: { name: 'Portfolio Project Images', marker: 'portfolio-project-images' },
+  social: { name: 'Portfolio Social Preview', marker: 'portfolio-social-preview' },
+} as const;
 
 export function hasGoogleDriveSettings(): boolean {
   return Boolean(
@@ -60,10 +65,45 @@ async function authorizedFetch(url: string, init: RequestInit = {}): Promise<Res
   return response;
 }
 
-export async function uploadProjectImageToDrive(file: File): Promise<string> {
+async function getImageFolderId(target: keyof typeof IMAGE_FOLDERS): Promise<string> {
+  if (!folderPromises.has(target)) {
+    const folderInfo = IMAGE_FOLDERS[target];
+    const promise = (async () => {
+      const query = new URLSearchParams({
+        q: `mimeType = 'application/vnd.google-apps.folder' and trashed = false and appProperties has { key='portfolioFolder' and value='${folderInfo.marker}' }`,
+        fields: 'files(id),nextPageToken',
+        pageSize: '1',
+      });
+      const list = await authorizedFetch(`${DRIVE_API}?${query}`);
+      const found = await list.json() as { files?: { id: string }[] };
+      if (!list.ok) throw new Error('Gagal mencari folder gambar proyek di Google Drive');
+      if (found.files?.[0]?.id) return found.files[0].id;
+
+      const created = await authorizedFetch(`${DRIVE_API}?fields=id`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: folderInfo.name,
+          mimeType: 'application/vnd.google-apps.folder',
+          appProperties: { portfolioFolder: folderInfo.marker },
+        }),
+      });
+      const folder = await created.json() as { id?: string };
+      if (!created.ok || !folder.id) throw new Error('Gagal membuat folder gambar proyek di Google Drive');
+      return folder.id;
+    })().catch(error => {
+      folderPromises.delete(target);
+      throw error;
+    });
+    folderPromises.set(target, promise);
+  }
+  return folderPromises.get(target)!;
+}
+
+async function uploadImageToDrive(file: File, target: keyof typeof IMAGE_FOLDERS): Promise<string> {
   const boundary = `portfolio-${crypto.randomUUID()}`;
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-') || 'project-image';
-  const metadata = { name: `${Date.now()}-${safeName}` };
+  const metadata = { name: `${Date.now()}-${safeName}`, parents: [await getImageFolderId(target)] };
   const body = Buffer.concat([
     Buffer.from(`--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n--${boundary}\r\nContent-Type: ${file.type}\r\n\r\n`),
     Buffer.from(await file.arrayBuffer()),
@@ -76,7 +116,15 @@ export async function uploadProjectImageToDrive(file: File): Promise<string> {
   });
   const result = await response.json() as { id?: string };
   if (!response.ok || !result.id) throw new Error('Upload ke Google Drive gagal');
-  return `/api/project-image/${encodeURIComponent(result.id)}`;
+  return `/api/${target === 'project' ? 'project-image' : 'social-image'}/${encodeURIComponent(result.id)}`;
+}
+
+export async function uploadProjectImageToDrive(file: File): Promise<string> {
+  return uploadImageToDrive(file, 'project');
+}
+
+export async function uploadSocialImageToDrive(file: File): Promise<string> {
+  return uploadImageToDrive(file, 'social');
 }
 
 export async function getProjectImageFromDrive(id: string): Promise<Response> {

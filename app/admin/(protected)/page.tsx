@@ -22,6 +22,8 @@ export default function AdminPage() {
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
   const [expandedOngoing, setExpandedOngoing] = useState<string | null>(null);
   const [tagInputs, setTagInputs] = useState<Record<string, string>>({});
+  const [uploadingImage, setUploadingImage] = useState<string | null>(null);
+  const [pendingImages, setPendingImages] = useState<string[]>([]);
 
   useEffect(() => {
     fetch('/api/admin/portfolio').then(async r => {
@@ -50,7 +52,7 @@ export default function AdminPage() {
       setSaving(false);
       return;
     }
-    setSaving(false); setSaved(true);
+    setSaving(false); setSaved(true); setPendingImages([]);
     setTimeout(() => setSaved(false), 2500);
   };
 
@@ -74,12 +76,12 @@ export default function AdminPage() {
   const { profile, skills, projects, experiences, contact, ongoingProjects = [], settings } = data;
 
   /* ── helpers ── */
-  const updateProfile = (k: string, v: string | boolean) => setData({ ...data, profile: { ...data.profile, [k]: v } });
+  const updateProfile = (k: string, v: string | boolean) => setData(prev => prev ? { ...prev, profile: { ...prev.profile, [k]: v } } : prev);
   const updateProfileI18n = (k: string, lang: 'id' | 'en', v: string) => {
     const prev = (data.profile as unknown as Record<string, { id: string; en: string }>)[k] || { id: '', en: '' };
     setData({ ...data, profile: { ...data.profile, [k]: { ...prev, [lang]: v } } });
   };
-  const updateProject   = (id: string, u: Partial<Project>) => setData({ ...data, projects: data.projects.map(p => p.id === id ? { ...p, ...u } : p) });
+  const updateProject   = (id: string, u: Partial<Project>) => setData(prev => prev ? { ...prev, projects: prev.projects.map(p => p.id === id ? { ...p, ...u } : p) } : prev);
   const updateProjectI18n = (id: string, lang: 'id' | 'en', v: string) => setData({ ...data, projects: data.projects.map(p => p.id === id ? { ...p, description: { ...p.description, [lang]: v } } : p) });
   const deleteProject   = (id: string) => { setData({ ...data, projects: data.projects.filter(p => p.id !== id) }); if (expandedProject === id) setExpandedProject(null); };
   const addProject = () => {
@@ -103,17 +105,22 @@ export default function AdminPage() {
   const updateSettings  = (k: string, v: string | boolean) => setData({ ...data, settings: { ...data.settings, [k]: v } });
   const updateContactI18n = (field: 'headline' | 'subtext', lang: 'id' | 'en', v: string) => setData({ ...data, contact: { ...data.contact, [field]: { ...data.contact[field], [lang]: v } } });
   const updateContactLink = (key: 'whatsapp' | 'email' | 'linkedin' | 'github' | 'website', value: string) => setData({ ...data, contact: { ...data.contact, links: { ...(data.contact.links || {}), [key]: value } } });
-  const uploadImage = async (file: File, onDone: (url: string) => void, target?: 'project') => {
+  const uploadImage = async (file: File, onDone: (url: string) => void, target: 'project' | 'social', key: string) => {
     setSaveError(null);
+    setUploadingImage(key);
     try {
-      const form = new FormData(); form.append('file', file);
-      if (target) form.append('target', target);
+      const form = new FormData(); form.append('file', file); form.append('target', target);
       const res = await fetch('/api/admin/upload', { method: 'POST', body: form });
       const body = await res.json().catch(() => ({}));
-      if (res.ok && body.url) onDone(body.url);
+      if (res.ok && body.url) {
+        onDone(body.url);
+        setPendingImages(prev => prev.includes(key) ? prev : [...prev, key]);
+      }
       else setSaveError(body.error || 'Upload gambar gagal');
     } catch {
       setSaveError('Upload gambar gagal. Periksa koneksi dan coba lagi.');
+    } finally {
+      setUploadingImage(null);
     }
   };
 
@@ -150,12 +157,12 @@ export default function AdminPage() {
             <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: 16, color: 'var(--text)' }}>Admin Panel</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button onClick={save} disabled={saving} style={{
+            <button onClick={save} disabled={saving || uploadingImage !== null} style={{
               background: saved ? 'var(--success)' : 'var(--accent)', color: '#fff', border: 'none',
               padding: '9px 22px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              fontFamily: 'Inter, sans-serif', transition: 'all 0.25s', opacity: saving ? 0.7 : 1,
+              fontFamily: 'Inter, sans-serif', transition: 'all 0.25s', opacity: saving || uploadingImage ? 0.7 : 1,
             }}>
-              {saved ? '✓ Tersimpan' : saving ? 'Menyimpan...' : 'Simpan Perubahan'}
+              {saved ? '✓ Tersimpan' : saving ? 'Menyimpan...' : uploadingImage ? 'Mengunggah...' : 'Simpan Perubahan'}
             </button>
             <button onClick={logout} style={{
               background: 'transparent', color: 'var(--text-2)', border: '1px solid var(--border)',
@@ -214,9 +221,11 @@ export default function AdminPage() {
                     <Field label="URL gambar social preview" value={profile.socialImageUrl || ''} onChange={v => updateProfile('socialImageUrl', v)} placeholder="https://.../social-preview.png" />
                     <div>
                       <label style={LBL}>Upload gambar social preview (maks. 5 MB)</label>
-                      <input type="file" accept="image/*" onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage(f, url => updateProfile('socialImageUrl', url)); }} />
+                      <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={e => { const f = e.target.files?.[0]; if (f) void uploadImage(f, url => updateProfile('socialImageUrl', url), 'social', 'social'); e.target.value = ''; }} />
                     </div>
                   </div>
+                  {uploadingImage === 'social' && <p role="status" style={{ fontSize: 12, color: 'var(--text-muted)' }}>Mengunggah gambar...</p>}
+                  <ImagePreview url={profile.socialImageUrl} alt="Gambar social preview portfolio" pending={pendingImages.includes('social')} />
                   <div className="admin-grid2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
                     <Field label="Judul — Indonesia" value={typeof profile.title === 'object' ? profile.title.id : profile.title} onChange={v => updateProfileI18n('title', 'id', v)} />
                     <Field label="Judul — English" value={typeof profile.title === 'object' ? profile.title.en : ''} onChange={v => updateProfileI18n('title', 'en', v)} />
@@ -281,8 +290,9 @@ export default function AdminPage() {
                         </div>
                         <div>
                           <label style={LBL}>Gambar proyek (maks. 5 MB)</label>
-                           <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage(f, url => updateProject(p.id, { image: url }), 'project'); }} />
-                          {p.image && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>{p.image}</div>}
+                          <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={e => { const f = e.target.files?.[0]; if (f) void uploadImage(f, url => updateProject(p.id, { image: url }), 'project', p.id); e.target.value = ''; }} />
+                          {uploadingImage === p.id && <p role="status" style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>Mengunggah gambar...</p>}
+                          <ImagePreview url={p.image} alt={`Gambar proyek ${p.title}`} pending={pendingImages.includes(p.id)} />
                         </div>
                         <div className="admin-grid2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                           <Field label="Deskripsi — Indonesia" value={typeof p.description === 'object' ? p.description.id : ''} onChange={v => updateProjectI18n(p.id, 'id', v)} textarea />
@@ -536,6 +546,27 @@ export default function AdminPage() {
 }
 
 /* ── Shared Components ── */
+function ImagePreview({ url, alt, pending }: { url?: string; alt: string; pending: boolean }) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  if (!url) return <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Belum ada gambar yang dipilih.</p>;
+  const validUrl = url.startsWith('/') && !url.startsWith('//') || /^https?:\/\//i.test(url);
+  return (
+    <div style={{ border: '1px solid var(--border)', borderRadius: 8, padding: 12, maxWidth: 360, background: 'var(--bg-surface)' }}>
+      <p style={{ fontSize: 12, color: pending ? 'var(--accent)' : 'var(--text-2)', marginBottom: 8 }}>
+        {pending ? 'Gambar baru — klik Simpan Perubahan' : 'Gambar saat ini'}
+      </p>
+      {validUrl && failedUrl !== url ? (
+        // The image may be served by the authenticated Drive proxy, which is not configured for next/image.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={url} alt={alt} onError={() => setFailedUrl(url)} style={{ display: 'block', width: '100%', maxHeight: 190, objectFit: 'contain', background: 'var(--bg)', borderRadius: 4 }} />
+      ) : (
+        <p role="status" style={{ fontSize: 12, color: 'var(--danger)' }}>Pratinjau gambar tidak tersedia. Periksa URL atau koneksi Drive.</p>
+      )}
+      {validUrl && <a href={url} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 12, color: 'var(--accent)', marginTop: 8 }}>Buka gambar ↗</a>}
+    </div>
+  );
+}
+
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', background: 'var(--bg-card)' }}>

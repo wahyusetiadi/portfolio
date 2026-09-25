@@ -11,8 +11,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   try {
     const data = await readPortfolioData();
-    const imagePath = `/api/project-image/${id}`;
-    if (!data.projects.some(project => project.image === imagePath) && !isAdminRequest(request)) {
+    if (data.profile.socialImageUrl !== `/api/social-image/${id}` && !isAdminRequest(request)) {
       return new NextResponse(null, { status: 404 });
     }
     if (!isGoogleDriveConfigured()) {
@@ -33,6 +32,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       },
     });
   } catch {
-    return NextResponse.json({ error: 'Gagal mengambil gambar proyek' }, { status: 502 });
+    return NextResponse.json({ error: 'Gagal mengambil gambar social preview' }, { status: 502 });
   }
 }
