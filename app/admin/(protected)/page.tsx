@@ -23,6 +23,7 @@ export default function AdminPage() {
   const [expandedOngoing, setExpandedOngoing] = useState<string | null>(null);
   const [tagInputs, setTagInputs] = useState<Record<string, string>>({});
   const [uploadingImage, setUploadingImage] = useState<string | null>(null);
+  const [deletingImage, setDeletingImage] = useState<string | null>(null);
   const [pendingImages, setPendingImages] = useState<string[]>([]);
 
   useEffect(() => {
@@ -124,6 +125,29 @@ export default function AdminPage() {
     }
   };
 
+  const deleteImage = async (target: 'project' | 'social', key: string, projectId?: string) => {
+    if (!window.confirm('Hapus gambar dari portfolio? File yang diunggah ke Drive akan dipindahkan ke Sampah.')) return;
+    setSaveError(null);
+    setDeletingImage(key);
+    try {
+      const response = await fetch('/api/admin/image', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target, projectId }),
+      });
+      const result = await response.json().catch(() => ({})) as { error?: string; warning?: string };
+      if (!response.ok) throw new Error(result.error || 'Gagal menghapus gambar');
+      if (target === 'social') updateProfile('socialImageUrl', '');
+      else if (projectId) updateProject(projectId, { image: '' });
+      setPendingImages(prev => prev.filter(id => id !== key));
+      if (result.warning) setSaveError(result.warning);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Gagal menghapus gambar');
+    } finally {
+      setDeletingImage(null);
+    }
+  };
+
   const addTag = (listKey: 'project' | 'ongoing', id: string) => {
     const key = `${listKey}-${id}`;
     const t = (tagInputs[key] || '').trim(); if (!t) return;
@@ -157,12 +181,12 @@ export default function AdminPage() {
             <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: 16, color: 'var(--text)' }}>Admin Panel</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button onClick={save} disabled={saving || uploadingImage !== null} style={{
+            <button onClick={save} disabled={saving || uploadingImage !== null || deletingImage !== null} style={{
               background: saved ? 'var(--success)' : 'var(--accent)', color: '#fff', border: 'none',
               padding: '9px 22px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              fontFamily: 'Inter, sans-serif', transition: 'all 0.25s', opacity: saving || uploadingImage ? 0.7 : 1,
+              fontFamily: 'Inter, sans-serif', transition: 'all 0.25s', opacity: saving || uploadingImage || deletingImage ? 0.7 : 1,
             }}>
-              {saved ? '✓ Tersimpan' : saving ? 'Menyimpan...' : uploadingImage ? 'Mengunggah...' : 'Simpan Perubahan'}
+              {saved ? '✓ Tersimpan' : saving ? 'Menyimpan...' : uploadingImage ? 'Mengunggah...' : deletingImage ? 'Menghapus...' : 'Simpan Perubahan'}
             </button>
             <button onClick={logout} style={{
               background: 'transparent', color: 'var(--text-2)', border: '1px solid var(--border)',
@@ -225,7 +249,7 @@ export default function AdminPage() {
                     </div>
                   </div>
                   {uploadingImage === 'social' && <p role="status" style={{ fontSize: 12, color: 'var(--text-muted)' }}>Mengunggah gambar...</p>}
-                  <ImagePreview url={profile.socialImageUrl} alt="Gambar social preview portfolio" pending={pendingImages.includes('social')} />
+                  <ImagePreview url={profile.socialImageUrl} alt="Gambar social preview portfolio" pending={pendingImages.includes('social')} deleting={deletingImage === 'social'} onDelete={() => void deleteImage('social', 'social')} />
                   <div className="admin-grid2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
                     <Field label="Judul — Indonesia" value={typeof profile.title === 'object' ? profile.title.id : profile.title} onChange={v => updateProfileI18n('title', 'id', v)} />
                     <Field label="Judul — English" value={typeof profile.title === 'object' ? profile.title.en : ''} onChange={v => updateProfileI18n('title', 'en', v)} />
@@ -292,7 +316,7 @@ export default function AdminPage() {
                           <label style={LBL}>Gambar proyek (maks. 5 MB)</label>
                           <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={e => { const f = e.target.files?.[0]; if (f) void uploadImage(f, url => updateProject(p.id, { image: url }), 'project', p.id); e.target.value = ''; }} />
                           {uploadingImage === p.id && <p role="status" style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>Mengunggah gambar...</p>}
-                          <ImagePreview url={p.image} alt={`Gambar proyek ${p.title}`} pending={pendingImages.includes(p.id)} />
+                          <ImagePreview url={p.image} alt={`Gambar proyek ${p.title}`} pending={pendingImages.includes(p.id)} deleting={deletingImage === p.id} onDelete={() => void deleteImage('project', p.id, p.id)} />
                         </div>
                         <div className="admin-grid2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                           <Field label="Deskripsi — Indonesia" value={typeof p.description === 'object' ? p.description.id : ''} onChange={v => updateProjectI18n(p.id, 'id', v)} textarea />
@@ -546,7 +570,7 @@ export default function AdminPage() {
 }
 
 /* ── Shared Components ── */
-function ImagePreview({ url, alt, pending }: { url?: string; alt: string; pending: boolean }) {
+function ImagePreview({ url, alt, pending, deleting, onDelete }: { url?: string; alt: string; pending: boolean; deleting: boolean; onDelete: () => void }) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   if (!url) return <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Belum ada gambar yang dipilih.</p>;
   const validUrl = url.startsWith('/') && !url.startsWith('//') || /^https?:\/\//i.test(url);
@@ -563,6 +587,10 @@ function ImagePreview({ url, alt, pending }: { url?: string; alt: string; pendin
         <p role="status" style={{ fontSize: 12, color: 'var(--danger)' }}>Pratinjau gambar tidak tersedia. Periksa URL atau koneksi Drive.</p>
       )}
       {validUrl && <a href={url} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 12, color: 'var(--accent)', marginTop: 8 }}>Buka gambar ↗</a>}
+      <button type="button" onClick={onDelete} disabled={pending || deleting} style={{ display: 'block', marginTop: 10, padding: '6px 10px', border: '1px solid var(--danger)', borderRadius: 6, background: 'transparent', color: 'var(--danger)', cursor: pending || deleting ? 'not-allowed' : 'pointer', fontSize: 12, opacity: pending || deleting ? 0.6 : 1 }}>
+        {deleting ? 'Menghapus...' : 'Hapus gambar'}
+      </button>
+      {pending && <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>Simpan gambar baru sebelum menghapusnya.</p>}
     </div>
   );
 }

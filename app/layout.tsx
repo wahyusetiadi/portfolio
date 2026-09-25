@@ -17,7 +17,7 @@ async function getSettings() {
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await readPortfolioData().catch(() => null);
-  const socialImage = data?.profile?.socialImageUrl || '/social-preview.png';
+  const socialImage = data?.profile?.socialImageUrl;
   return {
   title: 'Wahyu Setiadi — Fullstack Web Developer',
   description: 'Portfolio Wahyu Setiadi, Fullstack Web Developer yang membangun aplikasi web end-to-end dengan React, Next.js, Node.js, dan TypeScript.',
@@ -35,10 +35,10 @@ export async function generateMetadata(): Promise<Metadata> {
     title: 'Wahyu Setiadi — Fullstack Web Developer',
     description: 'Portfolio Wahyu Setiadi, Fullstack Web Developer.',
     siteName: 'Wahyu Setiadi',
-    images: [{ url: socialImage, width: 1200, height: 630, alt: 'Wahyu Setiadi portfolio' }],
+    images: socialImage ? [{ url: socialImage, width: 1200, height: 630, alt: 'Wahyu Setiadi portfolio' }] : undefined,
     ...(process.env.NEXT_PUBLIC_SITE_URL ? { url: process.env.NEXT_PUBLIC_SITE_URL } : {}),
   },
-  twitter: { card: 'summary_large_image', title: 'Wahyu Setiadi — Fullstack Web Developer' },
+  twitter: { card: socialImage ? 'summary_large_image' : 'summary', title: 'Wahyu Setiadi — Fullstack Web Developer' },
 };
 
 }

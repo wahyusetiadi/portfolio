@@ -13,7 +13,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const data = await readPortfolioData();
     const imagePath = `/api/project-image/${id}`;
     if (!data.projects.some(project => project.image === imagePath) && !isAdminRequest(request)) {
-      return new NextResponse(null, { status: 404 });
+      return new NextResponse(null, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     }
     if (!isGoogleDriveConfigured()) {
       return NextResponse.json({ error: 'Google Drive belum dikonfigurasi' }, { status: 503 });
@@ -28,7 +28,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return new NextResponse(response.body, {
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+        'Cache-Control': 'private, no-store, max-age=0',
+        'Vercel-CDN-Cache-Control': 'no-store',
         'X-Content-Type-Options': 'nosniff',
       },
     });

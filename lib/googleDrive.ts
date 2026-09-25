@@ -128,5 +128,18 @@ export async function uploadSocialImageToDrive(file: File): Promise<string> {
 }
 
 export async function getProjectImageFromDrive(id: string): Promise<Response> {
+  const metadata = await authorizedFetch(`${DRIVE_API}/${encodeURIComponent(id)}?fields=trashed`);
+  if (!metadata.ok) return metadata;
+  const file = await metadata.json() as { trashed?: boolean };
+  if (file.trashed) return new Response(null, { status: 404 });
   return authorizedFetch(`${DRIVE_API}/${encodeURIComponent(id)}?alt=media`);
+}
+
+export async function trashDriveImage(id: string): Promise<void> {
+  const response = await authorizedFetch(`${DRIVE_API}/${encodeURIComponent(id)}?fields=id`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ trashed: true }),
+  });
+  if (!response.ok && response.status !== 404) throw new Error('Gagal memindahkan gambar ke Sampah Google Drive');
 }
