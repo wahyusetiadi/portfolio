@@ -103,12 +103,18 @@ export default function AdminPage() {
   const updateSettings  = (k: string, v: string | boolean) => setData({ ...data, settings: { ...data.settings, [k]: v } });
   const updateContactI18n = (field: 'headline' | 'subtext', lang: 'id' | 'en', v: string) => setData({ ...data, contact: { ...data.contact, [field]: { ...data.contact[field], [lang]: v } } });
   const updateContactLink = (key: 'whatsapp' | 'email' | 'linkedin' | 'github' | 'website', value: string) => setData({ ...data, contact: { ...data.contact, links: { ...(data.contact.links || {}), [key]: value } } });
-  const uploadImage = async (file: File, onDone: (url: string) => void) => {
-    const form = new FormData(); form.append('file', file);
-    const res = await fetch('/api/admin/upload', { method: 'POST', body: form });
-    const body = await res.json().catch(() => ({}));
-    if (res.ok && body.url) onDone(body.url);
-    else setSaveError(body.error || 'Upload gambar gagal');
+  const uploadImage = async (file: File, onDone: (url: string) => void, target?: 'project') => {
+    setSaveError(null);
+    try {
+      const form = new FormData(); form.append('file', file);
+      if (target) form.append('target', target);
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: form });
+      const body = await res.json().catch(() => ({}));
+      if (res.ok && body.url) onDone(body.url);
+      else setSaveError(body.error || 'Upload gambar gagal');
+    } catch {
+      setSaveError('Upload gambar gagal. Periksa koneksi dan coba lagi.');
+    }
   };
 
   const addTag = (listKey: 'project' | 'ongoing', id: string) => {
@@ -275,7 +281,7 @@ export default function AdminPage() {
                         </div>
                         <div>
                           <label style={LBL}>Gambar proyek (maks. 5 MB)</label>
-                          <input type="file" accept="image/*" onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage(f, url => updateProject(p.id, { image: url })); }} />
+                           <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage(f, url => updateProject(p.id, { image: url }), 'project'); }} />
                           {p.image && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>{p.image}</div>}
                         </div>
                         <div className="admin-grid2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>

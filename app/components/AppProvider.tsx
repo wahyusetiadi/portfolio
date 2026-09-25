@@ -37,6 +37,7 @@ export function AppProvider({
     }
     if (savedLang && multiLangEnabled && (savedLang === 'id' || savedLang === 'en')) {
       setLangState(savedLang);
+      document.documentElement.lang = savedLang;
     }
   }, [defaultTheme, multiLangEnabled]);
 
@@ -49,6 +50,7 @@ export function AppProvider({
 
   const setLang = (l: Lang) => {
     setLangState(l);
+    document.documentElement.lang = l;
     localStorage.setItem('pf-lang', l);
   };
 

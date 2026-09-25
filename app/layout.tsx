@@ -17,7 +17,7 @@ async function getSettings() {
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await readPortfolioData().catch(() => null);
-  const socialImage = data?.profile?.socialImageUrl || '/logo.png';
+  const socialImage = data?.profile?.socialImageUrl || '/social-preview.png';
   return {
   title: 'Wahyu Setiadi — Fullstack Web Developer',
   description: 'Portfolio Wahyu Setiadi, Fullstack Web Developer yang membangun aplikasi web end-to-end dengan React, Next.js, Node.js, dan TypeScript.',

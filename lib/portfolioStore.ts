@@ -76,6 +76,14 @@ export async function readPortfolioData(): Promise<PortfolioData> {
   return readFromFile();
 }
 
+export function toPublicPortfolioData(data: PortfolioData): PortfolioData {
+  return {
+    ...data,
+    ongoingProjects: (data.ongoingProjects || []).filter(project => project.public),
+    contact: { ...data.contact, messages: [] },
+  };
+}
+
 export async function writePortfolioData(data: PortfolioData): Promise<void> {
   if (hasUpstashEnv()) {
     const key = getUpstashKey();

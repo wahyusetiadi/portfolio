@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import { readPortfolioData, writePortfolioData } from "@/lib/portfolioStore";
+import { readPortfolioData, toPublicPortfolioData, writePortfolioData } from "@/lib/portfolioStore";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -14,14 +14,7 @@ export async function GET() {
   try {
     const parsed = await readPortfolioData();
     // Jangan expose pesan kontak (email, dll) ke publik.
-    const safe = {
-      ...parsed,
-      contact: {
-        ...(parsed?.contact || {}),
-        messages: [],
-      },
-    };
-    return NextResponse.json(safe);
+    return NextResponse.json(toPublicPortfolioData(parsed));
   } catch {
     return NextResponse.json({ error: "Failed to read data" }, { status: 500 });
   }

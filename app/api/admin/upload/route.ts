@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { getAdminCookieName, verifyAdminSessionToken } from "@/lib/auth";
+import { hasGoogleDriveSettings, isGoogleDriveConfigured, uploadProjectImageToDrive } from "@/lib/googleDrive";
 
 function isAuthed(request: Request) {
   const cookie = request.headers.get("cookie") || "";
@@ -17,6 +18,15 @@ export async function POST(request: Request) {
     if (!(file instanceof File)) return NextResponse.json({ error: "File tidak ditemukan" }, { status: 400 });
     if (!file.type.startsWith("image/")) return NextResponse.json({ error: "File harus berupa gambar" }, { status: 400 });
     if (file.size > 5 * 1024 * 1024) return NextResponse.json({ error: "Ukuran gambar maksimal 5 MB" }, { status: 400 });
+    if (form.get('target') === 'project' && hasGoogleDriveSettings() && !isGoogleDriveConfigured()) {
+      return NextResponse.json({ error: 'Konfigurasi Google Drive belum lengkap. Periksa Client ID, Client Secret, dan Refresh Token.' }, { status: 503 });
+    }
+    if (form.get('target') === 'project' && isGoogleDriveConfigured()) {
+      if (!['image/jpeg', 'image/png', 'image/webp', 'image/avif'].includes(file.type)) {
+        return NextResponse.json({ error: 'Gunakan JPG, PNG, WebP, atau AVIF untuk gambar proyek' }, { status: 400 });
+      }
+      return NextResponse.json({ url: await uploadProjectImageToDrive(file) });
+    }
     const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
     const filename = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
     const dir = path.join(process.cwd(), "public", "uploads");
