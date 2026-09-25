@@ -9,8 +9,18 @@ function getFileDataPath(): string {
   return process.env.PORTFOLIO_DATA_PATH || DEFAULT_DATA_PATH;
 }
 
+function getUpstashCredentials(): { url: string; token: string } | null {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (url && token) return { url, token };
+
+  const kvUrl = process.env.KV_REST_API_URL;
+  const kvToken = process.env.KV_REST_API_TOKEN;
+  return kvUrl && kvToken ? { url: kvUrl, token: kvToken } : null;
+}
+
 function hasUpstashEnv(): boolean {
-  return Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+  return getUpstashCredentials() !== null;
 }
 
 function getUpstashKey(): string {
@@ -18,14 +28,13 @@ function getUpstashKey(): string {
 }
 
 async function upstashCommand(command: unknown[]): Promise<unknown> {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) throw new Error("Upstash env is not configured");
+  const credentials = getUpstashCredentials();
+  if (!credentials) throw new Error("Upstash env is not configured");
 
-  const res = await fetch(url, {
+  const res = await fetch(credentials.url, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${credentials.token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(command),
@@ -97,7 +106,7 @@ export async function writePortfolioData(data: PortfolioData): Promise<void> {
     const message = err instanceof Error ? err.message : String(err);
     throw new Error(
       `Failed to write portfolio data to disk (${getFileDataPath()}): ${message}. ` +
-        "On serverless hosts (e.g. Vercel), the filesystem is read-only; configure UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN for persistence.",
+        "On serverless hosts (e.g. Vercel), the filesystem is read-only; configure an Upstash Redis REST URL and token for persistence.",
     );
   }
 }

@@ -40,7 +40,7 @@ Jika Anda sudah membuat token saat status **Testing**, jalankan kembali skrip ot
 
 Jika tidak ada variabel Google Drive, upload proyek menggunakan `public/uploads` seperti sebelumnya. Jika baru sebagian variabel yang terisi, upload proyek menampilkan error konfigurasi agar tidak tersimpan ke lokasi yang salah. Pada deployment, isi ketiga variabel yang sama di **Vercel → Project Settings → Environment Variables** untuk environment Production. Tambahkan `NEXT_PUBLIC_SITE_URL=https://wsdmc.vercel.app`. Gambar lama di `public/uploads` perlu tetap tersedia sampai diunggah ulang ke Drive.
 
-Metadata proyek (termasuk URL gambar) disimpan terpisah dari file gambar. Pada Vercel, konfigurasi `UPSTASH_REDIS_REST_URL` dan `UPSTASH_REDIS_REST_TOKEN` diperlukan agar perubahan dari admin tersimpan setelah deployment. Kedua nilai harus berasal dari satu database Upstash yang sama. Setelah menambah atau mengganti environment variable di Vercel, lakukan redeploy agar deployment baru memakainya.
+Metadata proyek (termasuk URL gambar) disimpan terpisah dari file gambar. Pada Vercel, konfigurasi pasangan `UPSTASH_REDIS_REST_URL` dan `UPSTASH_REDIS_REST_TOKEN` diperlukan agar perubahan dari admin tersimpan setelah deployment. Integrasi Vercel juga dapat membuat pasangan `KV_REST_API_URL` dan `KV_REST_API_TOKEN`; aplikasi menerima salah satu pasangan tersebut. Kedua nilai harus berasal dari satu database Upstash yang sama. Setelah menambah atau mengganti environment variable di Vercel, lakukan redeploy agar deployment baru memakainya.
 
 ## 4. Verifikasi lokal dan Vercel
 
